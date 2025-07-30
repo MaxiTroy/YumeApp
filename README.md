@@ -57,3 +57,20 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+
+src/app/
+├── components/          # Componentes reutilizables
+│   ├── ui/             # Componentes de UI básicos (botones, inputs, etc.)
+│   ├── layout/         # Componentes de layout (header, footer, etc.)
+│   └── shared/         # Componentes compartidos entre páginas
+├── pages/              # Páginas principales de la aplicación
+│   ├── home/
+│   ├── dashboard/
+│   ├── profile/
+│   └── settings/
+├── services/           # Servicios de la aplicación
+├── models/             # Interfaces y tipos TypeScript
+├── guards/             # Guards de Angular
+├── pipes/              # Pipes personalizados
+└── utils/              # Utilidades y helpers
