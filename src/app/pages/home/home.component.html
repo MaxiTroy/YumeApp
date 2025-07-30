@@ -1,0 +1,39 @@
+<div class="home-container">
+  <div class="home-header">
+    <h1>¡Bienvenido a Yume Graph!</h1>
+    <p>Tu aplicación personalizada para gestionar tus sueños y metas</p>
+  </div>
+
+  <div class="cards-grid">
+    @for (card of cards; track card.title) {
+    <!-- TODO: Separar en un componente -->
+    <mat-card class="home-card" (click)="onCardClick(card)">
+      <mat-card-header>
+        <div class="card-icon">
+          <mat-icon>{{ card.icon }}</mat-icon>
+        </div>
+        <mat-card-title>{{ card.title }}</mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <p>{{ card.description }}</p>
+      </mat-card-content>
+    </mat-card>
+    }
+  </div>
+
+  <!-- Card de información importante que ocupa todo el ancho -->
+  <!-- TODO: Separar en un componente -->
+  <mat-card class="important-info-card" (click)="onCardClick(importantInfo)">
+    <!-- <mat-card-header>
+      <div class="card-icon important-icon">
+        <mat-icon>{{ importantInfo.icon }}</mat-icon>
+      </div>
+      <mat-card-title>{{ importantInfo.title }}</mat-card-title>
+    </mat-card-header> -->
+
+    <mat-card-content>
+      <p [innerHTML]="importantInfo.description" class="description-text"></p>
+    </mat-card-content>
+  </mat-card>
+</div>

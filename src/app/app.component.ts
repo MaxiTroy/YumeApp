@@ -6,7 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { SidenavComponent } from '@components/sidenav/sidenav.component';
+import { SidenavComponent } from '@components/layout/sidenav/sidenav.component';
 
 @Component({
   selector: 'app-root',
