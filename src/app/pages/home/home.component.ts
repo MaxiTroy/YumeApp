@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -16,17 +17,20 @@ export class HomeComponent {
       description:
         'Aca podes sacar un presupuesto, tan solo necesitas la cantidad de paginas que tiene tu archivo y el tipo de impresion que necesitas ✨',
       icon: 'calculate',
+      path: '/estimate',
     },
     {
       title: 'Productos',
       description:
         'Podes ver todos nuestros productos! Ademas podes ver nuestros productos personalizados que hacemos a pedido 💪🏽',
       icon: 'assignment',
+      path: '/products',
     },
     {
       title: 'Nuevo producto',
       description: 'Tenemos un nuevo producto? No te olvides de cargarlo.! 🙌🏽',
       icon: 'assignment_add',
+      path: '/new-product',
     },
   ];
 
@@ -38,7 +42,11 @@ export class HomeComponent {
     highlight: true,
   };
 
+  constructor(private router: Router) {}
+
   onCardClick(card: any) {
-    console.log('Card clicked:', card.title);
+    if (card.path) {
+      this.router.navigate([card.path]);
+    }
   }
 }

@@ -1,0 +1,60 @@
+<div class="products-container">
+  <!-- TODO: Llevar el header solo (sin la barra de busqueda) a un componente reusable  -->
+  <div class="products-header">
+    <h1>Nuestros Productos</h1>
+    <p>Descubre nuestra amplia gama de productos de impresión personalizada</p>
+
+    <div class="search-container">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Buscar productos...</mat-label>
+        <input
+          matInput
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearchChange($event)"
+          placeholder="Escribe para buscar..."
+        />
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="products-grid">
+    @defer (when filteredProducts.length > 0) { @for (product of
+    filteredProducts; track product.id) {
+    <mat-card class="product-card" (click)="onProductClick(product)">
+      <mat-card-content class="product-content">
+        <div class="product-header">
+          <h3 class="product-title">{{ product.name }}</h3>
+          <div class="product-category">{{ product.category }}</div>
+        </div>
+
+        <p class="product-description">{{ product.description }}</p>
+
+        <div class="product-price">
+          <span class="price-amount">${{ product.price | number }}</span>
+          <span class="price-currency">ARS</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+    } } @placeholder { @for (item of [1, 2, 3, 4, 5, 6]; track item) {
+    <mat-card class="product-card product-skeleton">
+      <mat-card-content class="product-content">
+        <div class="skeleton-header">
+          <div class="skeleton-title"></div>
+          <div class="skeleton-category"></div>
+        </div>
+        <div class="skeleton-description"></div>
+        <div class="skeleton-price"></div>
+      </mat-card-content>
+    </mat-card>
+    } }
+  </div>
+
+  @if (filteredProducts.length === 0 && searchTerm) {
+  <div class="no-results">
+    <mat-icon>search_off</mat-icon>
+    <h3>No se encontraron productos</h3>
+    <p>Intenta con otros términos de búsqueda</p>
+  </div>
+  }
+</div>
