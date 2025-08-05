@@ -25,4 +25,11 @@ export const routes: Routes = [
         (m) => m.NewProductComponent
       ),
   },
+  {
+    path: 'calculator',
+    loadComponent: () =>
+      import('./pages/calculator/calculator.component').then(
+        (m) => m.CalculatorComponent
+      ),
+  },
 ];

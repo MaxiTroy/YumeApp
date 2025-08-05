@@ -17,7 +17,7 @@ export class HomeComponent {
       description:
         'Aca podes sacar un presupuesto, tan solo necesitas la cantidad de paginas que tiene tu archivo y el tipo de impresion que necesitas ✨',
       icon: 'calculate',
-      path: '/estimate',
+      path: '/calculator',
     },
     {
       title: 'Productos',
