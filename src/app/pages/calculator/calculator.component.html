@@ -1,1 +1,279 @@
-<p>calculator works!</p>
+<div class="calculator-container">
+  <mat-card class="calculator-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>calculate</mat-icon>
+        Calculadora de Presupuestos
+      </mat-card-title>
+      <mat-card-subtitle> Calcula el costo de tus productos </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Formulario para agregar productos -->
+      <div class="form-section">
+        <h3>Agregar Producto</h3>
+        <form [formGroup]="budgetForm">
+          <div class="form-grid">
+            <!-- Primera fila: Producto y Cantidad -->
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="half-width">
+                <mat-label>Producto a vender</mat-label>
+                <mat-select formControlName="product">
+                  @for (product of productOptions; track product.value) {
+                  <mat-option [value]="product.value">
+                    {{ product.label }}
+                    @if (product.basePrice) { - ${{ product.basePrice }}
+                    }
+                  </mat-option>
+                  }
+                </mat-select>
+                @if (budgetForm.get('product')?.hasError('required')) {
+                <mat-error> Selecciona un producto </mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="half-width">
+                <mat-label>Cantidad</mat-label>
+                <input
+                  matInput
+                  type="number"
+                  formControlName="quantity"
+                  placeholder="Ingresa la cantidad"
+                />
+                @if (budgetForm.get('quantity')?.hasError('required')) {
+                <mat-error> La cantidad es obligatoria </mat-error>
+                } @if (budgetForm.get('quantity')?.hasError('min')) {
+                <mat-error> La cantidad debe ser mayor a 0 </mat-error>
+                }
+              </mat-form-field>
+            </div>
+
+            <!-- Campos de impresión (solo para productos de impresión) -->
+            @if (showPrintFields()) {
+            <div class="print-fields">
+              <!-- Segunda fila: Tipo de Impresión y Tipo de Papel -->
+              <div class="form-row">
+                <mat-form-field appearance="outline" class="half-width">
+                  <mat-label>Tipo de Impresión</mat-label>
+                  <mat-select formControlName="printType">
+                    @for (printType of printTypeOptions; track printType.value)
+                    {
+                    <mat-option [value]="printType.value">
+                      {{ printType.label }} (x{{ printType.multiplier }})
+                    </mat-option>
+                    }
+                  </mat-select>
+                  <mat-error
+                    *ngIf="budgetForm.get('printType')?.hasError('required')"
+                  >
+                    Selecciona el tipo de impresión
+                  </mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="half-width">
+                  <mat-label>Tipo de Papel</mat-label>
+                  <mat-select formControlName="paperType">
+                    @for (paper of paperTypeOptions; track paper.value) {
+                    <mat-option [value]="paper.value">
+                      {{ paper.label }} - ${{ paper.pricePerSheet }}
+                    </mat-option>
+                    }
+                  </mat-select>
+                  <mat-error
+                    *ngIf="budgetForm.get('paperType')?.hasError('required')"
+                  >
+                    Selecciona el tipo de papel
+                  </mat-error>
+                </mat-form-field>
+              </div>
+
+              <!-- Tercera fila: Impresiones por hoja -->
+              <div class="form-row">
+                <mat-form-field appearance="outline" class="half-width">
+                  <mat-label>Impresiones por hoja</mat-label>
+                  <mat-select formControlName="printsPerSheet">
+                    @for (option of printsPerSheetOptions; track option.value) {
+                    <mat-option [value]="option.value">
+                      {{ option.label }}
+                    </mat-option>
+                    }
+                  </mat-select>
+                  <mat-error
+                    *ngIf="
+                      budgetForm.get('printsPerSheet')?.hasError('required')
+                    "
+                  >
+                    Selecciona las impresiones por hoja
+                  </mat-error>
+                </mat-form-field>
+
+                <div class="half-width button-container">
+                  <button
+                    mat-raised-button
+                    color="primary"
+                    type="button"
+                    (click)="addProduct()"
+                    [disabled]="budgetForm.invalid"
+                    class="add-btn"
+                  >
+                    <mat-icon>add</mat-icon>
+                    Agregar Producto
+                  </button>
+                </div>
+              </div>
+            </div>
+            }
+
+            <!-- Botón de agregar para productos no de impresión -->
+            @if(!showPrintFields() && budgetForm.get('product')?.value){
+            <div class="form-row">
+              <div class="full-width button-container">
+                <button
+                  mat-raised-button
+                  color="primary"
+                  type="button"
+                  (click)="addProduct()"
+                  [disabled]="budgetForm.invalid"
+                  class="add-btn"
+                >
+                  <mat-icon>add</mat-icon>
+                  Agregar Producto
+                </button>
+              </div>
+            </div>
+            }
+          </div>
+        </form>
+
+        <!-- Vista previa del subtotal -->
+        <div *ngIf="budgetForm.valid" class="subtotal-preview">
+          <mat-card class="preview-card">
+            <mat-card-content>
+              <div class="preview-item">
+                <span>Subtotal del producto:</span>
+                <span>${{ calculateSubtotal() | number : "1.2-2" }}</span>
+              </div>
+
+              <!-- Desglose para productos de impresión -->
+              @if (showPrintFields() && getPaperPrice() > 0) {
+              <div class="preview-breakdown">
+                <div class="breakdown-item">
+                  <span>Precio base (papel):</span>
+                  <span>${{ getPaperPrice() }}</span>
+                </div>
+                <div class="breakdown-item">
+                  <span>Cantidad:</span>
+                  <span>{{ budgetForm.get("quantity")?.value || 0 }}</span>
+                </div>
+                @if (getPrintTypeMultiplier() !== 1) {
+                <div class="breakdown-item">
+                  <span>Multiplicador:</span>
+                  <span>x{{ getPrintTypeMultiplier() }}</span>
+                </div>
+                } @if (budgetForm.get('printsPerSheet')?.value) {
+                <div class="breakdown-item">
+                  <span>Impresiones por hoja:</span>
+                  <span>{{ budgetForm.get("printsPerSheet")?.value }}</span>
+                </div>
+                }
+              </div>
+              }
+
+              <!-- Desglose para productos no de impresión -->
+              @if (!showPrintFields() && getProductPrice() > 0) {
+              <div class="preview-breakdown">
+                <div class="breakdown-item">
+                  <span>Precio base (producto):</span>
+                  <span>${{ getProductPrice() }}</span>
+                </div>
+                <div class="breakdown-item">
+                  <span>Cantidad:</span>
+                  <span>{{ budgetForm.get("quantity")?.value || 0 }}</span>
+                </div>
+              </div>
+              }
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+
+      <!-- Lista de productos agregados -->
+      @if (budgetItems.length > 0) {
+      <div class="products-section">
+        <mat-divider></mat-divider>
+        <h3>Productos en el Presupuesto</h3>
+
+        <div class="products-list">
+          @for (item of budgetItems; track item.id) {
+          <mat-card class="product-item">
+            <mat-card-content>
+              <div class="product-header">
+                <div class="product-info">
+                  <h4>{{ getProductLabel(item.product) }}</h4>
+                  <p>Cantidad: {{ item.quantity }}</p>
+                  @if (item.printType) {
+                  <p>
+                    Tipo de impresión: {{ getPrintTypeLabel(item.printType) }}
+                  </p>
+                  } @if (item.paperType) {
+                  <p>Tipo de papel: {{ getPaperTypeLabel(item.paperType) }}</p>
+                  } @if (item.printsPerSheet) {
+                  <p>Impresiones por hoja: {{ item.printsPerSheet }}</p>
+                  }
+                </div>
+                <div class="product-actions">
+                  <span class="subtotal"
+                    >${{ item.subtotal | number : "1.2-2" }}</span
+                  >
+                  <button
+                    mat-icon-button
+                    color="warn"
+                    (click)="removeProduct(item.id)"
+                    class="remove-btn"
+                  >
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+          }
+        </div>
+      </div>
+      }
+
+      <!-- Resumen de Precios -->
+      @if(budgetItems.length > 0) {
+      <div class="price-summary">
+        <mat-card class="summary-card">
+          <mat-card-header>
+            <mat-card-title>Resumen del Presupuesto</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="price-grid">
+              <div class="price-item">
+                <span>Productos agregados:</span>
+                <span>{{ budgetItems.length }}</span>
+              </div>
+              <div class="price-item total">
+                <span><strong>TOTAL:</strong></span>
+                <span
+                  ><strong>${{ total | number : "1.2-2" }}</strong></span
+                >
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+      }
+
+      <!-- Botón de limpiar todo -->
+      <div *ngIf="budgetItems.length > 0" class="form-row center-buttons">
+        <button mat-button type="button" (click)="resetAll()">
+          <mat-icon>refresh</mat-icon>
+          Limpiar Todo
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
