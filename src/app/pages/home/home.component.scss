@@ -140,3 +140,43 @@
     }
   }
 }
+
+.error-container {
+  margin: 20px 0;
+}
+
+.error-card {
+  background-color: #ffebee;
+  border: 2px solid #f44336;
+}
+
+.error-content {
+  text-align: center;
+  padding: 20px;
+
+  .error-icon {
+    font-size: 48px;
+    color: #f44336;
+    margin-bottom: 15px;
+    width: 48px;
+    height: 48px;
+  }
+
+  h3 {
+    color: #d32f2f;
+    margin-bottom: 10px;
+    font-size: 1.3rem;
+  }
+
+  p {
+    color: #666;
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+
+  button {
+    mat-icon {
+      margin-right: 8px;
+    }
+  }
+}

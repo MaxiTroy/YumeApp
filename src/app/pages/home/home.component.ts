@@ -1,52 +1,68 @@
-import { Component } from '@angular/core';
-import { MatCardModule } from '@angular/material/card';
+import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
+import {
+  ApiService,
+  HomeCard,
+  ImportantInfo,
+} from '../../services/api.service';
 
 @Component({
   selector: 'app-home',
-  imports: [MatCardModule, MatButtonModule, MatIconModule],
+  imports: [MatCardModule, MatButtonModule, MatIconModule, CommonModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
-export class HomeComponent {
-  cards = [
-    {
-      title: 'Presupuestos',
-      description:
-        'Aca podes sacar un presupuesto, tan solo necesitas la cantidad de paginas que tiene tu archivo y el tipo de impresion que necesitas ✨',
-      icon: 'calculate',
-      path: '/calculator',
-    },
-    {
-      title: 'Productos',
-      description:
-        'Podes ver todos nuestros productos! Ademas podes ver nuestros productos personalizados que hacemos a pedido 💪🏽',
-      icon: 'assignment',
-      path: '/products',
-    },
-    {
-      title: 'Nuevo producto',
-      description: 'Tenemos un nuevo producto? No te olvides de cargarlo.! 🙌🏽',
-      icon: 'assignment_add',
-      path: '/new-product',
-    },
-  ];
+export class HomeComponent implements OnInit {
+  cards: HomeCard[] = [];
+  importantInfo: ImportantInfo | null = null;
+  loading = true;
+  error = false;
 
-  importantInfo = {
-    title: '¡Información Importante!',
-    description:
-      'Horarios de atención: Lunes a Viernes de 9:00 a 18:00. \n Envíos gratuitos en compras superiores a $25.000. \n Tamaños de Referencia \n A4 -> 21 x 29,7 cm (tamaño estandar) \n A3 -> 29,7 x 42 cm (doble A4) \n A5 -> 14,8 x 21 cm (mitad A4) \n A6 -> 10,5 x 14,8 cm (mitad A5)',
-    icon: 'info',
-    highlight: true,
-  };
+  constructor(private router: Router, private apiService: ApiService) {}
 
-  constructor(private router: Router) {}
+  ngOnInit() {
+    this.loadHomeData();
+  }
 
-  onCardClick(card: any) {
-    if (card.path) {
+  loadHomeData() {
+    this.loading = true;
+    this.error = false;
+
+    // Cargar cards del home
+    this.apiService.getServices().subscribe({
+      next: (cards) => {
+        this.cards = cards;
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error cargando cards:', error);
+        this.error = true;
+        this.loading = false;
+      },
+    });
+
+    // Cargar información importante
+    this.apiService.getImportantInfo().subscribe({
+      next: (info) => {
+        this.importantInfo = info[0] || null; // Tomar el primer elemento
+      },
+      error: (error) => {
+        console.error('Error cargando información importante:', error);
+      },
+    });
+  }
+
+  onCardClick(card: HomeCard | ImportantInfo) {
+    if ('path' in card && card.path) {
       this.router.navigate([card.path]);
     }
+  }
+
+  retryLoad() {
+    this.loadHomeData();
   }
 }

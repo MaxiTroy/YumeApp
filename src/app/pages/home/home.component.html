@@ -4,9 +4,39 @@
     <p>Tu aplicación personalizada para gestionar tus sueños y metas</p>
   </div>
 
+  <!-- Estado de carga -->
+  @if (loading) {
+  <div class="loading-container">
+    <div class="loading-spinner">
+      <mat-icon class="spinner-icon">refresh</mat-icon>
+      <p>Cargando...</p>
+    </div>
+  </div>
+  }
+
+  <!-- Estado de error -->
+  @if (error) {
+  <div class="error-container">
+    <mat-card class="error-card">
+      <mat-card-content>
+        <div class="error-content">
+          <mat-icon class="error-icon">error</mat-icon>
+          <h3>Error al cargar los datos</h3>
+          <p>No se pudo conectar con la base de datos.</p>
+          <button mat-raised-button color="primary" (click)="retryLoad()">
+            <mat-icon>refresh</mat-icon>
+            Reintentar
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+  }
+
+  <!-- Contenido principal -->
+  @if (!loading) {
   <div class="cards-grid">
-    @for (card of cards; track card.title) {
-    <!-- TODO: Separar en un componente -->
+    @for (card of cards; track card.id) {
     <mat-card class="home-card" (click)="onCardClick(card)">
       <mat-card-header>
         <div class="card-icon">
@@ -22,18 +52,12 @@
     }
   </div>
 
-  <!-- Card de información importante que ocupa todo el ancho -->
-  <!-- TODO: Separar en un componente -->
+  <!-- Card de información importante -->
+  @if (importantInfo) {
   <mat-card class="important-info-card" (click)="onCardClick(importantInfo)">
-    <!-- <mat-card-header>
-      <div class="card-icon important-icon">
-        <mat-icon>{{ importantInfo.icon }}</mat-icon>
-      </div>
-      <mat-card-title>{{ importantInfo.title }}</mat-card-title>
-    </mat-card-header> -->
-
     <mat-card-content>
       <p [innerHTML]="importantInfo.description" class="description-text"></p>
     </mat-card-content>
   </mat-card>
+  } }
 </div>
